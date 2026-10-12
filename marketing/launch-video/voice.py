@@ -10,7 +10,7 @@ from kokoro_onnx import Kokoro
 HERE = os.path.dirname(os.path.abspath(__file__))
 TTS = os.path.join(HERE, 'build', 'tts')
 VERSION = sys.argv[1] if len(sys.argv) > 1 else 'guide'
-VOICE = sys.argv[2] if len(sys.argv) > 2 else 'af_heart'
+VOICE = sys.argv[2] if len(sys.argv) > 2 else 'bm_fable'
 LEN = 30.5
 
 # (start, latest end, text). "Field print" is spelled out so it is said clearly.
