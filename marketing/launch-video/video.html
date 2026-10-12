@@ -171,6 +171,27 @@ function eyebrow(t, start, txt, x, y, align = 'left') {
   rise(t, start, txt.toUpperCase(), x, y, 30, { weight: 500, cond: false, color: C.gold, ls: '4.5px', align });
 }
 
+// ---------- words: ?v=guide (default) or ?v=buyer ----------
+const VERSION = new URLSearchParams(location.search).get('v') === 'buyer' ? 'buyer' : 'guide';
+const TX = {
+  guide: {
+    shotEye: 'For safari guides', shot1: 'You took the shot.', shot2: 'Your guests still', shot3: 'talk about it.',
+    wallEye: 'Framed or unframed', wall1: 'Now they can', wall2: 'hang it at home.',
+    shopEye: 'Your own shop', shop1: 'Your best photos.', shop2: 'One link to share.', shopName: 'Your Name',
+    shipEye: 'No stock. No packing.', ship1: 'We print it.', ship2: 'We ship it.', ship3: 'Anywhere.',
+    steps: ['Payment received', 'Sent to the printer', 'Printed and framed', 'Shipped worldwide', 'Delivered'],
+    endLine1: 'Sell prints of your safari photos.', endLine2: 'We handle the rest.', endBtn: 'See an example shop',
+  },
+  buyer: {
+    shotEye: 'Back from safari?', shot1: 'Remember this?', shot2: 'That evening drive,', shot3: 'that light.',
+    wallEye: 'Framed or unframed', wall1: 'Now you can', wall2: 'hang it at home.',
+    shopEye: "Your guide's own shop", shop1: 'The photos from', shop2: 'your trip, in print.', shopName: 'Your Guide',
+    shipEye: 'Pick a size. Pick a frame.', ship1: 'See it first.', ship2: 'We print it.', ship3: 'We deliver it.',
+    steps: ['Choose your photo', 'Pick a size and frame', 'See exactly what gets printed', 'Printed to order', 'Delivered to your door'],
+    endLine1: 'Prints from the guides', endLine2: 'who showed you the wild.', endBtn: 'Visit an example shop',
+  },
+}[VERSION];
+
 // ---------- scenes ----------
 // 1. The shot (0 - 5.5)
 function sceneShot(t) {
@@ -179,10 +200,10 @@ function sceneShot(t) {
   ctx.fillStyle = PALETTES.dusk.land; ctx.fillRect(0, 0, W, H);
   photo(W / 2 - w * .45 + 120 - 160 * (t / 6), (H - h) / 2 - 470, w, h, 'dusk', 'giraffes', t / 6);
   scrim(H * .45, H, .95);
-  eyebrow(t, .3, 'For safari guides', 90, 1330);
-  rise(t, .6, 'You took the shot.', 90, 1470, 128);
-  rise(t, 2.4, 'Your guests still', 90, 1610, 96, { color: 'rgba(236,230,218,.82)' });
-  rise(t, 2.6, 'talk about it.', 90, 1710, 96, { color: 'rgba(236,230,218,.82)' });
+  eyebrow(t, .3, TX.shotEye, 90, 1330);
+  rise(t, .6, TX.shot1, 90, 1470, 128);
+  rise(t, 2.4, TX.shot2, 90, 1610, 96, { color: 'rgba(236,230,218,.82)' });
+  rise(t, 2.6, TX.shot3, 90, 1710, 96, { color: 'rgba(236,230,218,.82)' });
 }
 // 2. On the wall (5 - 10.5)
 function sceneWall(t) {
@@ -212,16 +233,16 @@ function sceneWall(t) {
     for (const a of [-.5, -.2, .1, .4]) { ctx.beginPath(); ctx.moveTo(875, 1080); ctx.lineTo(875 + Math.sin(a) * 120, 1080 - Math.cos(a) * 140); ctx.stroke(); }
     ctx.globalAlpha = 1;
   }
-  eyebrow(t, 1.6, 'Framed or unframed', 90, 1360);
-  rise(t, 1.9, 'Now they can', 90, 1500, 128);
-  rise(t, 2.1, 'hang it at home.', 90, 1625, 128);
+  eyebrow(t, 1.6, TX.wallEye, 90, 1360);
+  rise(t, 1.9, TX.wall1, 90, 1500, 128);
+  rise(t, 2.1, TX.wall2, 90, 1625, 128);
 }
 // 3. Your own shop (10 - 16.5)
 function sceneShop(t) {
   ctx.fillStyle = C.ground; ctx.fillRect(0, 0, W, H);
-  eyebrow(t, .3, 'Your own shop', W / 2, 190, 'center');
-  rise(t, .5, 'Your best photos.', W / 2, 310, 104, { align: 'center' });
-  rise(t, .7, 'One link to share.', W / 2, 410, 104, { align: 'center', color: 'rgba(236,230,218,.75)' });
+  eyebrow(t, .3, TX.shopEye, W / 2, 190, 'center');
+  rise(t, .5, TX.shop1, W / 2, 310, 104, { align: 'center' });
+  rise(t, .7, TX.shop2, W / 2, 410, 104, { align: 'center', color: 'rgba(236,230,218,.75)' });
   const k = ease((t - .4) / 1.1);
   const pw = 640, ph = 1300, px = (W - pw) / 2, py = lerp(H + 40, 500, k);
   // phone body
@@ -239,7 +260,7 @@ function sceneShop(t) {
   hg.addColorStop(0, 'rgba(21,21,19,0)'); hg.addColorStop(1, 'rgba(21,21,19,.92)');
   ctx.fillStyle = hg; ctx.fillRect(px, sy + 300, pw, 320);
   font(30, 600); ctx.letterSpacing = '0px'; ctx.fillStyle = C.bone; ctx.textAlign = 'left';
-  ctx.fillText('Your Name', px + 40, sy + 90);
+  ctx.fillText(TX.shopName, px + 40, sy + 90);
   font(22, 500, false); ctx.fillStyle = C.gold; ctx.letterSpacing = '3px';
   ctx.fillText('PHOTOGRAPHY FROM NAMIBIA', px + 40, sy + 470);
   font(64, 600); ctx.letterSpacing = '-1px'; ctx.fillStyle = C.bone;
@@ -282,11 +303,11 @@ function sceneShop(t) {
 // 4. We print and ship (16 - 21.5)
 function sceneShip(t) {
   ctx.fillStyle = C.ground; ctx.fillRect(0, 0, W, H);
-  eyebrow(t, .3, 'No stock. No packing.', 90, 260);
-  rise(t, .5, 'We print it.', 90, 390, 128);
-  rise(t, .8, 'We ship it.', 90, 515, 128);
-  rise(t, 1.1, 'Anywhere.', 90, 640, 128, { color: C.gold });
-  const steps = ['Payment received', 'Sent to the printer', 'Printed and framed', 'Shipped worldwide', 'Delivered'];
+  eyebrow(t, .3, TX.shipEye, 90, 260);
+  rise(t, .5, TX.ship1, 90, 390, 128);
+  rise(t, .8, TX.ship2, 90, 515, 128);
+  rise(t, 1.1, TX.ship3, 90, 640, 128, { color: C.gold });
+  const steps = TX.steps;
   const x0 = 120, y0 = 860, gap = 170;
   ctx.save();
   ctx.strokeStyle = C.line; ctx.lineWidth = 3;
@@ -334,6 +355,34 @@ function sceneEarn(t) {
   ctx.restore();
   rise(t, 2.6, 'Free to start. Paid out monthly.', 90, 1660, 46, { weight: 400, cond: false, color: 'rgba(236,230,218,.8)' });
 }
+// 5b. Buyer version: why trust it (21 - 26)
+function sceneTrust(t) {
+  ctx.fillStyle = C.ground; ctx.fillRect(0, 0, W, H);
+  photo(0, 0, W, 760, 'morning', 'herd', clamp(t / 5));
+  const g = ctx.createLinearGradient(0, 380, 0, 760);
+  g.addColorStop(0, 'rgba(21,21,19,0)'); g.addColorStop(1, 'rgba(21,21,19,1)');
+  ctx.fillStyle = g; ctx.fillRect(0, 380, W, 380);
+  eyebrow(t, .3, 'Every print', 90, 880);
+  rise(t, .5, 'Supports your guide.', 90, 1010, 128);
+  const box = { x: 90, y: 1110, w: W - 180, h: 480 };
+  const a = ease((t - .9) / .5);
+  ctx.save(); ctx.globalAlpha *= a;
+  hairline(box.x, box.y, box.w, box.h); marks(box.x, box.y, box.w, box.h);
+  ctx.restore();
+  const items = ['Exact crop preview before you buy', 'Made to order, shipped worldwide', 'Damaged in transit? Reprinted free'];
+  items.forEach((txt, i) => {
+    const st = 1.2 + i * .45, k = ease((t - st) / .5);
+    if (k <= 0) return;
+    const y = box.y + 120 + i * 135;
+    ctx.save(); ctx.globalAlpha *= k;
+    ctx.strokeStyle = C.gold; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(box.x + 55, y - 12); ctx.lineTo(box.x + 70, y + 3); ctx.lineTo(box.x + 98, y - 28); ctx.stroke();
+    font(48, 500); ctx.letterSpacing = '-.3px'; ctx.fillStyle = C.bone; ctx.textAlign = 'left';
+    ctx.fillText(txt, box.x + 130, y + (1 - k) * 20);
+    ctx.restore();
+  });
+  rise(t, 2.8, 'Your guide earns from every sale.', 90, 1700, 46, { weight: 400, cond: false, color: 'rgba(236,230,218,.8)' });
+}
 // 6. End card (25.5 - 30)
 function sceneEnd(t) {
   ctx.fillStyle = C.ground; ctx.fillRect(0, 0, W, H);
@@ -342,8 +391,8 @@ function sceneEnd(t) {
   g.addColorStop(0, 'rgba(21,21,19,0)'); g.addColorStop(1, 'rgba(21,21,19,1)');
   ctx.fillStyle = g; ctx.fillRect(0, H * .25, W, H * .27 + 2);
   rise(t, .3, 'Fieldprint', W / 2, 1150, 190, { align: 'center' });
-  rise(t, .8, 'Sell prints of your safari photos.', W / 2, 1270, 54, { align: 'center', weight: 400, cond: false, color: 'rgba(236,230,218,.85)' });
-  rise(t, 1.0, 'We handle the rest.', W / 2, 1340, 54, { align: 'center', weight: 400, cond: false, color: 'rgba(236,230,218,.85)' });
+  rise(t, .8, TX.endLine1, W / 2, 1270, 54, { align: 'center', weight: 400, cond: false, color: 'rgba(236,230,218,.85)' });
+  rise(t, 1.0, TX.endLine2, W / 2, 1340, 54, { align: 'center', weight: 400, cond: false, color: 'rgba(236,230,218,.85)' });
   const a = ease((t - 1.5) / .5);
   if (a > 0) {
     ctx.save(); ctx.globalAlpha *= a;
@@ -351,7 +400,7 @@ function sceneEnd(t) {
     ctx.fillStyle = C.gold; ctx.fillRect(bx, by, bw, bh);
     marks(bx, by, bw, bh, C.gold, 16);
     font(52, 600); ctx.letterSpacing = '0px'; ctx.fillStyle = C.ground; ctx.textAlign = 'center';
-    ctx.fillText('See an example shop', W / 2, by + 78);
+    ctx.fillText(TX.endBtn, W / 2, by + 78);
     font(36, 500, false); ctx.fillStyle = C.bone; ctx.letterSpacing = '1px';
     ctx.fillText('sebcaw.github.io/fieldprint', W / 2, by + 220);
     ctx.restore();
@@ -363,7 +412,7 @@ const SCENES = [
   [sceneWall, 5, 10.5, .5, .5],
   [sceneShop, 10, 16.5, .5, .5],
   [sceneShip, 16, 21.5, .5, .5],
-  [sceneEarn, 21, 26, .5, .5],
+  [VERSION === 'buyer' ? sceneTrust : sceneEarn, 21, 26, .5, .5],
   [sceneEnd, 25.5, 30.01, .5, 0.001],
 ];
 

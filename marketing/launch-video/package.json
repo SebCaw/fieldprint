@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "stills": "node record.js --stills",
-    "record": "node record.js"
+    "record": "node record.js",
+    "record:buyer": "node record.js --buyer"
   },
   "devDependencies": {
     "ffmpeg-static": "^5.2.0",
