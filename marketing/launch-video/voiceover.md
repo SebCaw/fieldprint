@@ -20,7 +20,7 @@ About 30 seconds each. Speak calmly, like you're telling a friend, not selling. 
 | 0 to 5s | Back from safari? Remember this? |
 | 5 to 10s | Now you can hang it at home. |
 | 10 to 16s | Your guide has their own print shop, full of photos from your trip. |
-| 16 to 21s | Pick a size and a frame, see exactly what gets printed, and we deliver it to your door. |
+| 16 to 21s | Pick a size and frame, see exactly what you get, and we deliver it. |
 | 21 to 26s | And every print supports your guide. |
 | 26 to 30s | Fieldprint. Ask your guide for their link. |
 

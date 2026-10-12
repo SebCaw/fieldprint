@@ -259,12 +259,48 @@ function reverb(inp, delays, ap) {
 const rvL = reverb(verbIn[0], [1557, 1617, 1491, 1422, 1277, 1356], [225, 556]);
 const rvR = reverb(verbIn[1], [1580, 1640, 1514, 1445, 1300, 1379], [248, 579]);
 
+// ---------- voiceover (made by voice.py) ----------
+function readWav(file) {
+  const b = fs.readFileSync(file);
+  let o = 12, sr = 0, ch = 1, data = null;
+  while (o < b.length) {
+    const id = b.toString('ascii', o, o + 4), size = b.readUInt32LE(o + 4);
+    if (id === 'fmt ') { ch = b.readUInt16LE(o + 10); sr = b.readUInt32LE(o + 12); }
+    if (id === 'data') data = b.subarray(o + 8, o + 8 + size);
+    o += 8 + size + (size % 2);
+  }
+  const n = data.length / 2 / ch, x = new Float32Array(n);
+  for (let i = 0; i < n; i++) x[i] = data.readInt16LE(i * 2 * ch) / 32768;
+  return { x, sr };
+}
+const voice = new Float32Array(N);
+const voiceFile = path.join(__dirname, 'build', BUYER ? 'voice-buyer.wav' : 'voice-guide.wav');
+if (fs.existsSync(voiceFile)) {
+  const { x, sr } = readWav(voiceFile);
+  const hp = biquad('hp', 90, .7);
+  for (let i = 0; i < N; i++) {
+    const p = i * sr / SR, j = Math.floor(p), f = p - j;
+    voice[i] = hp(j + 1 < x.length ? x[j] * (1 - f) + x[j + 1] * f : 0);
+  }
+}
+// duck the music while the voice speaks (fast down, slow back up)
+const duck = new Float32Array(N);
+{
+  let env = 0;
+  const att = Math.exp(-1 / (.03 * SR)), rel = Math.exp(-1 / (.45 * SR));
+  for (let i = 0; i < N; i++) {
+    const a = Math.min(1, Math.abs(voice[i]) * 8);
+    env = a > env ? att * env + (1 - att) * a : rel * env + (1 - rel) * a;
+    duck[i] = 1 - .62 * Math.min(1, env * 3);
+  }
+}
+
 // ---------- mix and write ----------
 const out = [new Float32Array(N), new Float32Array(N)];
 let peak = 0;
 for (let i = 0; i < N; i++) {
   for (let c = 0; c < 2; c++) {
-    const v = music[c][i] * .9 + sfx[c][i] * .8 + (c ? rvR[i] : rvL[i]) * .55;
+    const v = (music[c][i] * .9 + (c ? rvR[i] : rvL[i]) * .55) * duck[i] + sfx[c][i] * .8 * (.6 + .4 * duck[i]) + voice[i] * .95;
     out[c][i] = Math.tanh(v * 1.1) / 1.1; // gentle soft clip
     peak = Math.max(peak, Math.abs(out[c][i]));
   }
