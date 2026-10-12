@@ -2,9 +2,10 @@
 // Usage:  node record.js            -> fieldprint-launch.mp4
 //         node record.js --buyer    -> fieldprint-buyer.mp4 (buyer version)
 //         add --stills              -> a few JPEG frames in stills/ to check the look
+//         add --sound-only          -> remake the soundtrack and re-join it, without re-recording
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, execFileSync } = require('child_process');
 const puppeteer = require('puppeteer-core');
 const ffmpeg = require('ffmpeg-static');
 
@@ -13,7 +14,21 @@ const FPS = 30, DURATION = 30;
 const here = __dirname;
 const BUYER = process.argv.includes('--buyer');
 
+const NAME = BUYER ? 'fieldprint-buyer' : 'fieldprint-launch';
+const silent = path.join(here, 'build', NAME + '-silent.mp4');
+
+// makes the soundtrack with audio.js and joins it to the silent video
+function addSound() {
+  execFileSync(process.execPath, [path.join(here, 'audio.js'), ...(BUYER ? ['--buyer'] : [])], { stdio: 'inherit' });
+  const wav = path.join(here, 'build', BUYER ? 'audio-buyer.wav' : 'audio-guide.wav');
+  const out = path.join(here, NAME + '.mp4');
+  execFileSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', silent, '-i', wav, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+    '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', out]);
+  console.log('saved', out);
+}
+
 (async () => {
+  if (process.argv.includes('--sound-only')) return addSound();
   const browser = await puppeteer.launch({ executablePath: EDGE, headless: true });
   const page = await browser.newPage();
   await page.goto('file:///' + path.join(here, 'video.html').replace(/\\/g, '/') + '?record' + (BUYER ? '&v=buyer' : ''), { waitUntil: 'networkidle0' });
@@ -28,7 +43,8 @@ const BUYER = process.argv.includes('--buyer');
     return;
   }
 
-  const out = path.join(here, BUYER ? 'fieldprint-buyer.mp4' : 'fieldprint-launch.mp4');
+  fs.mkdirSync(path.join(here, 'build'), { recursive: true });
+  const out = silent;
   const ff = spawn(ffmpeg, ['-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', out],
     { stdio: ['pipe', 'ignore', 'inherit'] });
@@ -41,5 +57,5 @@ const BUYER = process.argv.includes('--buyer');
   ff.stdin.end();
   await new Promise(r => ff.on('close', r));
   await browser.close();
-  console.log('saved', out);
+  addSound();
 })();

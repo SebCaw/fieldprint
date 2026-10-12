@@ -4,7 +4,8 @@
   "scripts": {
     "stills": "node record.js --stills",
     "record": "node record.js",
-    "record:buyer": "node record.js --buyer"
+    "record:buyer": "node record.js --buyer",
+    "sound": "node record.js --sound-only && node record.js --buyer --sound-only"
   },
   "devDependencies": {
     "ffmpeg-static": "^5.2.0",
