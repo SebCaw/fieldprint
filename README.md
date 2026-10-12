@@ -31,8 +31,16 @@ Opens at http://localhost:5173.
 - `public` static files
 - `photos/originals` full-size originals, never committed
 - `photos/web` stripped web copies (no camera data, dates or locations)
-- `docs` decisions and open questions
+- `docs` the live test site (GitHub Pages)
 - `archive` old built HTML files, kept as a backup
+
+## Live test site
+
+https://sebcaw.github.io/fieldprint/ is served from `docs/index.html` by GitHub Pages.
+
+## Test-only shortcuts
+
+The live test version skips sign-in and lets every form go through empty, using test names and emails. These must be changed for the real version. Full list in `CLAUDE.md`.
 
 ## Rules
 

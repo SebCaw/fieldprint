@@ -37,8 +37,18 @@ Guide side: overview, favourites, photos and crops, upload quality checker, step
 
 Photos: Seb's Namibia photos are used in the storefront (titles and places are rough guesses). The generic test guide shop uses fake illustrated photos stamped "SAMPLE". Keep these separate. Web copies are stripped of camera data, dates and locations. Keep it that way. Originals never go in git.
 
+## Test-only shortcuts (MUST change for the real version)
+These were added so testers can click straight through. Undo them before real customers use it.
+- Sign-in page skips itself and logs in as the test guide (guide@example.com) or test customer (alex.morgan@example.com). Real version needs proper login (Supabase).
+- Checkout, guide sign-up and contact form have no required fields. Empty boxes fall back to test values (Alex Morgan, alex.morgan@example.com, Test Guide, guide@example.com, Namibia, test-guide). Real version must require a real name and email, and validate them.
+- Digital download button is pretend. Real version must deliver a private, expiring link to the 4000 px file.
+- Payments, order updates and payouts are fake.
+- All of the above were edited straight into the built file `docs/index.html` because the React source is missing. Redo them in the source once it is restored.
+
 ## Decisions
-- 6 GBP flat platform fee per order for now.
+- Platform fee: 10% of the sale, minimum 4 GBP (was 6 GBP flat). Full pricing model still undecided.
+- Digital downloads: optional per photo, guide sets the price, 4000 px wide file, personal use.
+- Live test site: GitHub Pages from `docs/` at https://sebcaw.github.io/fieldprint/ (repo is public for now).
 - Favourites rotation, not trip albums.
 - Pick shapes first, then crop.
 - Simple pricing view, breakdown hidden.
