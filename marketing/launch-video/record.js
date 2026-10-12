@@ -18,17 +18,17 @@ const NAME = BUYER ? 'fieldprint-buyer' : 'fieldprint-launch';
 const silent = path.join(here, 'build', NAME + '-silent.mp4');
 
 // makes the soundtrack with audio.js and joins it to the silent video
-function addSound() {
-  execFileSync(process.execPath, [path.join(here, 'audio.js'), ...(BUYER ? ['--buyer'] : [])], { stdio: 'inherit' });
-  const wav = path.join(here, 'build', BUYER ? 'audio-buyer.wav' : 'audio-guide.wav');
-  const out = path.join(here, NAME + '.mp4');
+function addSound(noMusic = false) {
+  execFileSync(process.execPath, [path.join(here, 'audio.js'), ...(BUYER ? ['--buyer'] : []), ...(noMusic ? ['--no-music'] : [])], { stdio: 'inherit' });
+  const wav = path.join(here, 'build', (BUYER ? 'audio-buyer' : 'audio-guide') + (noMusic ? '-nomusic' : '') + '.wav');
+  const out = path.join(here, NAME + (noMusic ? '-no-music' : '') + '.mp4');
   execFileSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', silent, '-i', wav, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
     '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', out]);
   console.log('saved', out);
 }
 
 (async () => {
-  if (process.argv.includes('--sound-only')) return addSound();
+  if (process.argv.includes('--sound-only')) { addSound(); addSound(true); return; }
   const browser = await puppeteer.launch({ executablePath: EDGE, headless: true });
   const page = await browser.newPage();
   await page.goto('file:///' + path.join(here, 'video.html').replace(/\\/g, '/') + '?record' + (BUYER ? '&v=buyer' : ''), { waitUntil: 'networkidle0' });
@@ -58,4 +58,5 @@ function addSound() {
   await new Promise(r => ff.on('close', r));
   await browser.close();
   addSound();
+  addSound(true);
 })();

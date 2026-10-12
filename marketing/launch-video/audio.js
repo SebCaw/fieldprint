@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BUYER = process.argv.includes('--buyer');
+const NO_MUSIC = process.argv.includes('--no-music'); // effects only, for adding a trending sound inside Instagram
 const SR = 48000, LEN = 30.5, N = Math.floor(SR * LEN);
 const music = [new Float32Array(N), new Float32Array(N)];
 const sfx = [new Float32Array(N), new Float32Array(N)];
@@ -209,14 +210,16 @@ function boom(t) {
 }
 
 // ---------- arrange ----------
-pad();
+if (!NO_MUSIC) pad();
 crickets(0, 5.6);
+if (!NO_MUSIC) {
 kalimbaLine(5.0, 26);
 shaker(10.2, 25.6);
 bass(10.2, 25.6);
 groove(16.2, 25.6);
 kalimbaLine(25.8, 29); // softer tail over the end card
 chime(28.6, [74, 78, 81, 86], .05);
+}
 
 shutter(.75);
 for (const c of [5.25, 10.25, 16.25, 21.25, 25.75]) whoosh(c);
@@ -272,7 +275,7 @@ buf.write('RIFF', 0); buf.writeUInt32LE(36 + N * 4, 4); buf.write('WAVE', 8); bu
 buf.writeUInt32LE(16, 16); buf.writeUInt16LE(1, 20); buf.writeUInt16LE(2, 22); buf.writeUInt32LE(SR, 24);
 buf.writeUInt32LE(SR * 4, 28); buf.writeUInt16LE(4, 32); buf.writeUInt16LE(16, 34); buf.write('data', 36); buf.writeUInt32LE(N * 4, 40);
 for (let i = 0; i < N; i++) for (let c = 0; c < 2; c++) buf.writeInt16LE(Math.round(Math.max(-1, Math.min(1, out[c][i] * norm)) * 32767), 44 + i * 4 + c * 2);
-const file = path.join(__dirname, 'build', BUYER ? 'audio-buyer.wav' : 'audio-guide.wav');
+const file = path.join(__dirname, 'build', (BUYER ? 'audio-buyer' : 'audio-guide') + (NO_MUSIC ? '-nomusic' : '') + '.wav');
 fs.mkdirSync(path.dirname(file), { recursive: true });
 fs.writeFileSync(file, buf);
 console.log('saved', file);
