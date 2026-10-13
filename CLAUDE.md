@@ -48,6 +48,7 @@ These were added so testers can click straight through. Undo them before real cu
 ## Decisions
 - Platform fee: 10% of the sale, minimum 4 GBP (was 6 GBP flat). Full pricing model still undecided.
 - Digital downloads: optional per photo, guide sets the price, 4000 px wide file, personal use.
+- Grain check on upload: measures noise at full resolution in the smooth areas of the photo. Each print size has a grain limit (bigger prints allow less), and sizes over it are hidden, like soft sizes. Limits are first guesses: tune them against real sample prints from Prodigi or Gelato.
 - Live test site: GitHub Pages from `docs/` at https://sebcaw.github.io/fieldprint/ (repo is public for now).
 - Favourites rotation, not trip albums.
 - Pick shapes first, then crop.
